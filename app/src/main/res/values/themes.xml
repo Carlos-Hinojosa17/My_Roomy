@@ -1,9 +1,7 @@
+<!-- res/values/themes.xml -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MyRoomy" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.MyRoomy" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Aplica bordes outline por defecto a todos los TextInputLayout -->
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
     </style>
-
-    <style name="Theme.MyRoomy" parent="Base.Theme.MyRoomy" />
 </resources>

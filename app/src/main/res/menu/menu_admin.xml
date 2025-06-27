@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_habitaciones"
+        android:title="Habitaciones"
+        android:icon="@drawable/ic_room" />
+    <item
+        android:id="@+id/nav_usuarios"
+        android:title="Usuarios"
+        android:icon="@drawable/ic_user" />
+</menu>

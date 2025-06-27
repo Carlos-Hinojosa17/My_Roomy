@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Lista de habitaciones -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerHabitaciones"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+
+    <!-- Layout cuando no hay habitaciones -->
+    <LinearLayout
+        android:id="@+id/layoutVacio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/txtSinHabitaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No existen habitaciones registradas"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="?android:textColorPrimary"
+            android:gravity="center"
+            android:paddingBottom="16dp"/>
+    </LinearLayout>
+
+    <!-- Único botón flotante -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAgregarHabitacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="88dp"
+        android:contentDescription="Agregar habitación"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/purple_500"
+        app:tint="@android:color/white" /> <!-- Subido para no ser tapado -->
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
