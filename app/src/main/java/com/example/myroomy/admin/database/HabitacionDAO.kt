@@ -17,7 +17,7 @@ class HabitacionDAO(context: Context) {
             put("imagen", habitacion.imagen)
             put("estado", habitacion.estado)
             put("precio", habitacion.precio)
-            put("servicios", habitacion.servicios.joinToString(",")) // Serializamos la lista
+            put("servicios", habitacion.servicios.joinToString(","))
             put("numeroHabitacion", habitacion.numeroHabitacion)
             put("piso", habitacion.piso)
         }
