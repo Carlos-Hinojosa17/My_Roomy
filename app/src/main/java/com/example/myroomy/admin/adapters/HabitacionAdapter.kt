@@ -38,10 +38,10 @@ class HabitacionAdapter(
         val h = lista[position]
 
         holder.txtNombre.text = h.nombre
-        holder.txtCategoria.text = h.categoria
-        holder.txtEstado.text = h.estado
-        holder.txtPiso.text = "Piso: ${h.piso}"                   // 🆕 Seteamos el piso
-        holder.txtPrecio.text = "S/ ${"%.2f".format(h.precio)}"   // 🆕 Seteamos el precio
+        holder.txtCategoria.text = "Categoría: ${h.categoria}"
+        holder.txtEstado.text = "Estado: ${h.estado}"
+        holder.txtPiso.text = "Piso: ${h.piso}"
+        holder.txtPrecio.text = "S/ ${"%.2f".format(h.precio)}"
 
         val context = holder.itemView.context
         if (h.imagen.startsWith("/")) {
@@ -55,5 +55,11 @@ class HabitacionAdapter(
         holder.btnEliminar.setOnClickListener { onEliminarClick(h) }
     }
 
-    override fun getItemCount(): Int = lista.size
+
+    override fun getItemCount(): Int {
+        return lista.size
+    }
+
 }
+
+
