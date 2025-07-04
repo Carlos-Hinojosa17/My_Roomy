@@ -2,6 +2,8 @@ package com.example.myroomy.dashboard.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.myroomy.R
@@ -9,9 +11,8 @@ import com.example.myroomy.dashboard.models.Habitacion
 import com.example.myroomy.databinding.ItemHabitacionCatalogoBinding
 
 class HabitacionCatalogoAdapter(
-    private val lista: MutableList<Habitacion>,
     private val onClick: (Habitacion) -> Unit
-) : RecyclerView.Adapter<HabitacionCatalogoAdapter.ViewHolder>() {
+) : ListAdapter<Habitacion, HabitacionCatalogoAdapter.ViewHolder>(DiffCallback()) {
 
     inner class ViewHolder(val binding: ItemHabitacionCatalogoBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -42,14 +43,16 @@ class HabitacionCatalogoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(lista[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount() = lista.size
+    class DiffCallback : DiffUtil.ItemCallback<Habitacion>() {
+        override fun areItemsTheSame(oldItem: Habitacion, newItem: Habitacion): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    fun actualizarDatos(nuevaLista: List<Habitacion>) {
-        lista.clear()
-        lista.addAll(nuevaLista)
-        notifyDataSetChanged()
+        override fun areContentsTheSame(oldItem: Habitacion, newItem: Habitacion): Boolean {
+            return oldItem == newItem
+        }
     }
 }

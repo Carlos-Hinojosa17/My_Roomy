@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.myroomy.dashboard.database.HabitacionDAO
 import com.example.myroomy.dashboard.models.Habitacion
+import com.example.myroomy.dashboard.utils.FragmentHelper
 import com.example.myroomy.databinding.FragmentAdminHabitacionFormBinding
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -51,19 +53,6 @@ class HabitacionFormFragment : Fragment() {
 
         habitacionDAO = HabitacionDAO(requireContext())
 
-        binding.btnAgregarServicio.setOnClickListener {
-            val servicio = binding.inputServicioUnitario.text.toString().trim()
-            if (servicio.isNotEmpty()) {
-                val chip = Chip(requireContext()).apply {
-                    text = servicio
-                    isCloseIconVisible = true
-                    setOnCloseIconClickListener { binding.chipGroupServicios.removeView(this) }
-                }
-                binding.chipGroupServicios.addView(chip)
-                binding.inputServicioUnitario.setText("")
-            }
-        }
-
         (binding.spinnerCategoria as? MaterialAutoCompleteTextView)?.setSimpleItems(categorias)
         (binding.spinnerEstado as? MaterialAutoCompleteTextView)?.setSimpleItems(estados)
 
@@ -80,15 +69,20 @@ class HabitacionFormFragment : Fragment() {
             rutaImagenGuardada = h.imagen
             Glide.with(this).load(File(h.imagen)).into(binding.previewImagen)
             h.servicios.forEach { servicio ->
-                val chip = Chip(requireContext()).apply {
-                    text = servicio
-                    isCloseIconVisible = true
-                    setOnCloseIconClickListener { binding.chipGroupServicios.removeView(this) }
-                }
+                val chip = crearChip(servicio)
                 binding.chipGroupServicios.addView(chip)
             }
         } ?: run {
             binding.txtTituloFormulario.text = "Agregar habitación"
+        }
+
+        binding.btnAgregarServicio.setOnClickListener {
+            val servicio = binding.inputServicioUnitario.text.toString().trim()
+            if (servicio.isNotEmpty()) {
+                val chip = crearChip(servicio)
+                binding.chipGroupServicios.addView(chip)
+                binding.inputServicioUnitario.setText("")
+            }
         }
 
         binding.btnSeleccionarImagen.setOnClickListener {
@@ -96,61 +90,73 @@ class HabitacionFormFragment : Fragment() {
         }
 
         binding.btnGuardarHabitacion.setOnClickListener {
-            val nombre = binding.inputNombre.text.toString()
-            val descripcion = binding.inputDescripcion.text.toString()
-            val categoria = (binding.spinnerCategoria as? MaterialAutoCompleteTextView)?.text.toString()
-            val estado = (binding.spinnerEstado as? MaterialAutoCompleteTextView)?.text.toString()
-            val piso = binding.inputPiso.text.toString().toIntOrNull() ?: 0
-            val numeroHabitacion = binding.inputNumeroHabitacion.text.toString()
-            val precio = binding.inputPrecio.text.toString().toDoubleOrNull() ?: 0.0
-
-            val servicios = mutableListOf<String>()
-            for (i in 0 until binding.chipGroupServicios.childCount) {
-                val chip = binding.chipGroupServicios.getChildAt(i) as Chip
-                servicios.add(chip.text.toString())
-            }
-
-            if (nombre.isBlank() || rutaImagenGuardada.isNullOrBlank()) {
-                Toast.makeText(requireContext(), "Completa nombre e imagen", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val habitacion = if (habitacionExistente != null) {
-                habitacionExistente!!.copy(
-                    nombre = nombre,
-                    descripcion = descripcion,
-                    categoria = categoria,
-                    imagen = rutaImagenGuardada!!,
-                    estado = estado,
-                    precio = precio,
-                    numeroHabitacion = numeroHabitacion,
-                    piso = piso,
-                    servicios = servicios
-                )
-            } else {
-                Habitacion(
-                    nombre = nombre,
-                    descripcion = descripcion,
-                    categoria = categoria,
-                    imagen = rutaImagenGuardada!!,
-                    estado = estado,
-                    precio = precio,
-                    numeroHabitacion = numeroHabitacion,
-                    piso = piso,
-                    servicios = servicios
-                )
-            }
-
-            if (habitacionExistente != null) {
-                habitacionDAO.actualizar(habitacion)
-                Toast.makeText(requireContext(), "Habitación actualizada", Toast.LENGTH_SHORT).show()
-            } else {
-                habitacionDAO.insertar(habitacion)
-                Toast.makeText(requireContext(), "Habitación guardada", Toast.LENGTH_SHORT).show()
-            }
-
-            parentFragmentManager.popBackStack()
+            guardarHabitacion()
         }
+    }
+
+    private fun crearChip(servicio: String): Chip {
+        return Chip(requireContext()).apply {
+            text = servicio
+            isCloseIconVisible = true
+            setOnCloseIconClickListener { binding.chipGroupServicios.removeView(this) }
+        }
+    }
+
+    private fun guardarHabitacion() {
+        val nombre = binding.inputNombre.text.toString()
+        val descripcion = binding.inputDescripcion.text.toString()
+        val categoria = (binding.spinnerCategoria as? MaterialAutoCompleteTextView)?.text.toString()
+        val estado = (binding.spinnerEstado as? MaterialAutoCompleteTextView)?.text.toString()
+        val piso = binding.inputPiso.text.toString().toIntOrNull() ?: 0
+        val numeroHabitacion = binding.inputNumeroHabitacion.text.toString()
+        val precio = binding.inputPrecio.text.toString().toDoubleOrNull() ?: 0.0
+
+        val servicios = mutableListOf<String>()
+        for (i in 0 until binding.chipGroupServicios.childCount) {
+            val chip = binding.chipGroupServicios.getChildAt(i) as Chip
+            servicios.add(chip.text.toString())
+        }
+
+        if (nombre.isBlank() || rutaImagenGuardada.isNullOrBlank()) {
+            Toast.makeText(requireContext(), "Completa nombre e imagen", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val habitacion = if (habitacionExistente != null) {
+            habitacionExistente!!.copy(
+                nombre = nombre,
+                descripcion = descripcion,
+                categoria = categoria,
+                imagen = rutaImagenGuardada!!,
+                estado = estado,
+                precio = precio,
+                numeroHabitacion = numeroHabitacion,
+                piso = piso,
+                servicios = servicios
+            )
+        } else {
+            Habitacion(
+                nombre = nombre,
+                descripcion = descripcion,
+                categoria = categoria,
+                imagen = rutaImagenGuardada!!,
+                estado = estado,
+                precio = precio,
+                numeroHabitacion = numeroHabitacion,
+                piso = piso,
+                servicios = servicios
+            )
+        }
+
+        if (habitacionExistente != null) {
+            habitacionDAO.actualizar(habitacion)
+            Toast.makeText(requireContext(), "Habitación actualizada", Toast.LENGTH_SHORT).show()
+        } else {
+            habitacionDAO.insertar(habitacion)
+            Toast.makeText(requireContext(), "Habitación guardada", Toast.LENGTH_SHORT).show()
+        }
+
+        parentFragmentManager.popBackStack()
     }
 
     private fun guardarImagenEnLocal(uri: Uri) {
@@ -172,5 +178,15 @@ class HabitacionFormFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        fun nuevaInstancia(habitacion: Habitacion? = null): HabitacionFormFragment {
+            val fragment = HabitacionFormFragment()
+            fragment.arguments = Bundle().apply {
+                putSerializable("habitacion", habitacion)
+            }
+            return fragment
+        }
     }
 }

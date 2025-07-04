@@ -8,9 +8,10 @@ import com.example.myroomy.R
 import com.example.myroomy.dashboard.models.Habitacion
 import com.example.myroomy.databinding.ItemCarruselDestacadoBinding
 
-
-class DestacadosAdapter(private val lista: List<Habitacion>) :
-    RecyclerView.Adapter<DestacadosAdapter.ViewHolder>() {
+class DestacadosAdapter(
+    private val lista: List<Habitacion>,
+    private val onItemClick: (Habitacion) -> Unit
+) : RecyclerView.Adapter<DestacadosAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemCarruselDestacadoBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -20,6 +21,10 @@ class DestacadosAdapter(private val lista: List<Habitacion>) :
                 .load(habitacion.imagen)
                 .placeholder(R.drawable.ic_room)
                 .into(binding.imgHabitacion)
+
+            binding.root.setOnClickListener {
+                onItemClick(habitacion)
+            }
         }
     }
 

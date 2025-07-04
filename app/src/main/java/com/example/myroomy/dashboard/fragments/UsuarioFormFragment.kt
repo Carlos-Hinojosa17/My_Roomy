@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.myroomy.dashboard.database.UsuarioDAO
 import com.example.myroomy.dashboard.models.TipoUsuario
 import com.example.myroomy.dashboard.models.Usuario
+import com.example.myroomy.dashboard.utils.FragmentHelper
 import com.example.myroomy.databinding.FragmentAdminUsuarioFormBinding
 import java.io.File
 import java.io.InputStream
@@ -64,7 +66,6 @@ class UsuarioFormFragment : Fragment() {
         )
         binding.spinnerTipoUsuario.setAdapter(adapter)
 
-        // Si viene para editar
         usuario?.let {
             binding.edtNombreUsuario.setText(it.nombre)
             binding.edtCorreoUsuario.setText(it.correo)

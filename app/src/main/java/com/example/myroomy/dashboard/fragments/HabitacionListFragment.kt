@@ -4,15 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myroomy.R
 import com.example.myroomy.dashboard.adapters.HabitacionAdapter
 import com.example.myroomy.dashboard.database.HabitacionDAO
 import com.example.myroomy.dashboard.models.Habitacion
+import com.example.myroomy.dashboard.utils.FragmentHelper
 import com.example.myroomy.databinding.FragmentAdminHabitacionListBinding
-
 
 class HabitacionListFragment : Fragment() {
 
@@ -39,18 +41,13 @@ class HabitacionListFragment : Fragment() {
         adapter = HabitacionAdapter(
             listaHabitaciones,
             onItemClick = { habitacionSeleccionada ->
-                val fragment = HabitacionFormFragment().apply {
-                    arguments = Bundle().apply {
-                        putSerializable("habitacion", habitacionSeleccionada)
-                    }
-                }
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.contenedor_main, fragment)
-                    .addToBackStack(null)
-                    .commit()
+                FragmentHelper.replaceWithSmoothSlide(
+                    requireActivity() as AppCompatActivity,
+                    HabitacionFormFragment.nuevaInstancia(habitacionSeleccionada)
+                )
             },
             onEliminarClick = { habitacion ->
-                eliminarHabitacion(habitacion)
+                confirmarEliminacion(habitacion)
             }
         )
 
@@ -58,10 +55,10 @@ class HabitacionListFragment : Fragment() {
         binding.recyclerHabitaciones.adapter = adapter
 
         binding.btnAgregarHabitacion.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.contenedor_main, HabitacionFormFragment())
-                .addToBackStack(null)
-                .commit()
+            FragmentHelper.replaceWithSmoothSlide(
+                requireActivity() as AppCompatActivity,
+                HabitacionFormFragment.nuevaInstancia()
+            )
         }
 
         cargarHabitaciones()
@@ -79,24 +76,34 @@ class HabitacionListFragment : Fragment() {
         verificarListaVacia()
     }
 
-    private fun eliminarHabitacion(habitacion: Habitacion) {
-        val alert = AlertDialog.Builder(requireContext())
+    private fun confirmarEliminacion(habitacion: Habitacion) {
+        AlertDialog.Builder(requireContext())
             .setTitle("¿Eliminar habitación?")
             .setMessage("¿Estás seguro de eliminar '${habitacion.nombre}'?")
             .setPositiveButton("Sí") { _, _ ->
-                val filasEliminadas = habitacionDAO.eliminar(habitacion.id)
-                if (filasEliminadas > 0) {
-                    val index = listaHabitaciones.indexOf(habitacion)
-                    if (index != -1) {
-                        listaHabitaciones.removeAt(index)
-                        adapter.notifyItemRemoved(index)
-                        verificarListaVacia()
-                    }
-                }
+                eliminarHabitacion(habitacion)
             }
             .setNegativeButton("Cancelar", null)
-            .create()
-        alert.show()
+            .show()
+    }
+
+    private fun eliminarHabitacion(habitacion: Habitacion) {
+        val filasEliminadas = habitacionDAO.eliminar(habitacion.id)
+        if (filasEliminadas > 0) {
+            // Buscar por ID para mayor seguridad
+            val index = listaHabitaciones.indexOfFirst { it.id == habitacion.id }
+            if (index != -1) {
+                listaHabitaciones.removeAt(index)
+                adapter.notifyItemRemoved(index)
+                verificarListaVacia()
+                Toast.makeText(requireContext(), "Habitación eliminada", Toast.LENGTH_SHORT).show()
+            } else {
+                // Refrescar por si acaso no se encontró
+                cargarHabitaciones()
+            }
+        } else {
+            Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun verificarListaVacia() {
@@ -108,7 +115,6 @@ class HabitacionListFragment : Fragment() {
             binding.layoutVacio.visibility = View.GONE
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

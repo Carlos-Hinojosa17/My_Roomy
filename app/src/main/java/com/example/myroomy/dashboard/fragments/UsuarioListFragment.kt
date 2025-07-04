@@ -3,12 +3,13 @@ package com.example.myroomy.dashboard.fragments
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myroomy.R
 import com.example.myroomy.dashboard.adapters.UsuarioAdapter
 import com.example.myroomy.dashboard.database.UsuarioDAO
 import com.example.myroomy.dashboard.models.Usuario
+import com.example.myroomy.dashboard.utils.FragmentHelper
 import com.example.myroomy.databinding.FragmentAdminUsuarioListBinding
 
 class UsuarioListFragment : Fragment() {
@@ -37,10 +38,7 @@ class UsuarioListFragment : Fragment() {
             listaUsuarios,
             onEditar = { usuarioSeleccionado ->
                 val fragment = UsuarioFormFragment.nuevaInstancia(usuarioSeleccionado)
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.contenedor_main, fragment)
-                    .addToBackStack(null)
-                    .commit()
+                FragmentHelper.replaceWithSmoothSlide(requireActivity() as AppCompatActivity, fragment)
             },
             onEliminar = { usuario ->
                 eliminarUsuario(usuario)
@@ -51,10 +49,7 @@ class UsuarioListFragment : Fragment() {
         binding.recyclerUsuarios.adapter = adapter
 
         binding.btnAgregarUsuario.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.contenedor_main, UsuarioFormFragment())
-                .addToBackStack(null)
-                .commit()
+            FragmentHelper.replaceWithSmoothSlide(requireActivity() as AppCompatActivity, UsuarioFormFragment())
         }
 
         cargarUsuarios()
