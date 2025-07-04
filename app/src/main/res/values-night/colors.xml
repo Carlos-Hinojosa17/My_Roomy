@@ -1,0 +1,7 @@
+<resources>
+    <color name="colorBackgroundCard">#1E1E1E</color>
+    <color name="colorTextoPrimario">#FFFFFF</color>
+    <color name="colorTextoSecundario">#CCCCCC</color>
+    <color name="colorPrecio">#81C784</color>
+    <color name="colorDelete">#EF5350</color>
+</resources>

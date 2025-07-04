@@ -5,8 +5,12 @@
     <color name="background_light">#F5F5F5</color>
     <color name="purple_500">#6200EE</color>
     <color name="purple_700">#3700B3</color>
-
-    <color name="md_theme_outline">#79747E</color> <!-- gris para bordes -->
+    <color name="md_theme_outline">#79747E</color>
     <color name="md_theme_outline_dark">#B0B0B0</color>
+    <color name="colorBackgroundCard">#FFFFFF</color>
+    <color name="colorTextoPrimario">#212121</color>
+    <color name="colorTextoSecundario">#666666</color>
+    <color name="colorPrecio">#4CAF50</color>
+    <color name="colorDelete">#F44336</color>
 
 </resources>

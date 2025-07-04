@@ -1,36 +1,105 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:padding="16dp">
 
-    <LinearLayout android:orientation="vertical"
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <TextView android:text="Formulario de Reserva" android:textSize="20sp"
-            android:textStyle="bold" android:layout_marginBottom="16dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
-
-        <EditText android:id="@+id/inputNombreCliente"
-            android:hint="Nombre del cliente" android:layout_width="match_parent"
+        <TextView
+            android:text="Formulario de Reserva"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <EditText android:id="@+id/inputDNICliente"
-            android:hint="DNI" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:inputType="number" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="12dp">
 
-        <EditText android:id="@+id/inputFechaInicio"
-            android:hint="Fecha de ingreso (YYYY-MM-DD)" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:focusable="false" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputNombreCliente"
+                android:hint="Nombre del cliente"
+                android:textColor="@android:color/white"
+                android:textColorHint="#aaaaaa"
+                android:inputType="textPersonName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText android:id="@+id/inputFechaFin"
-            android:hint="Fecha de salida (YYYY-MM-DD)" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:focusable="false" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="12dp">
 
-        <TextView android:id="@+id/txtTotal"
-            android:text="Total: S/ 0.00" android:layout_marginTop="16dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputDNICliente"
+                android:hint="DNI"
+                android:textColor="@android:color/white"
+                android:textColorHint="#aaaaaa"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <Button android:id="@+id/btnConfirmarReserva"
-            android:text="Confirmar Reserva" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:layout_marginTop="20dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputFechaInicio"
+                android:hint="Fecha de ingreso (YYYY-MM-DD)"
+                android:focusable="false"
+                android:textColor="@android:color/white"
+                android:textColorHint="#aaaaaa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputFechaFin"
+                android:hint="Fecha de salida (YYYY-MM-DD)"
+                android:focusable="false"
+                android:textColor="@android:color/white"
+                android:textColorHint="#aaaaaa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/txtTotal"
+            android:text="Total: S/ 0.00"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnConfirmarReserva"
+            android:text="Confirmar Reserva"
+            android:textAllCaps="false"
+            android:backgroundTint="#002bff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:padding="12dp"
+            android:fontFamily="sans-serif-medium" />
+
     </LinearLayout>
 </ScrollView>
