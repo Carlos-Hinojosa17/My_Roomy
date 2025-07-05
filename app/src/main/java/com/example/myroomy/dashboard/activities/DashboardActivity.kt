@@ -19,6 +19,7 @@ import com.example.myroomy.dashboard.models.TipoUsuario
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.navigation.NavigationView
 import java.io.File
+import androidx.core.content.edit
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -67,9 +68,10 @@ class DashboardActivity : AppCompatActivity() {
                 override fun onDrawerClosed(drawerView: View) {
                     when (item.itemId) {
                         R.id.nav_gestion_habitaciones -> replaceFragment(HabitacionListFragment())
+                        R.id.nav_gestion_reservas -> replaceFragment(ReservaListFragment())
                         R.id.nav_catalogo -> replaceFragment(CatalogoFragment())
                         R.id.nav_gestion_usuarios -> replaceFragment(UsuarioListFragment())
-                        R.id.nav_reservas -> replaceFragment(ClienteHomeFragment())
+                        R.id.nav_reservas -> replaceFragment(MisReservasFragment())
                         R.id.nav_perfil -> replaceFragment(PerfilFragment())
                         R.id.nav_cerrar_sesion -> cerrarSesion()
                         else -> Toast.makeText(this@DashboardActivity, "Opción no manejada", Toast.LENGTH_SHORT).show()
@@ -128,7 +130,7 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun cerrarSesion() {
-        getSharedPreferences("MyRoomyPrefs", MODE_PRIVATE).edit().clear().apply()
+        getSharedPreferences("MyRoomyPrefs", MODE_PRIVATE).edit { clear() }
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }

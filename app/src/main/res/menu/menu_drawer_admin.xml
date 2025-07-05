@@ -23,12 +23,6 @@
         android:id="@+id/nav_perfil"
         android:title="Mi perfil"
         android:icon="@drawable/ic_account" />
-
-    <item
-        android:id="@+id/nav_reportes"
-        android:title="Reportes"
-        android:icon="@drawable/ic_report" />
-
     <item
         android:id="@+id/nav_cerrar_sesion"
         android:title="Cerrar sesión"

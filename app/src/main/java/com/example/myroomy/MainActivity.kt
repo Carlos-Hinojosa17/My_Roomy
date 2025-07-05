@@ -152,38 +152,55 @@ class MainActivity : AppCompatActivity() {
                 urlFoto = fotoPathLocal
             )
             val idGenerado = dao.insertar(nuevoUsuario)
+
             if (idGenerado > 0) {
                 Log.i("GOOGLE_LOGIN", "Usuario Google insertado en BD con id: $idGenerado")
+
+                // Creamos un usuario con el ID real
+                val usuarioConId = nuevoUsuario.copy(id = idGenerado.toInt())
+                guardarEnPrefs(usuarioConId)
+
+                Toast.makeText(this, "Bienvenido, $nombre", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, DashboardActivity::class.java))
+                finish()
             } else {
                 Log.e("GOOGLE_LOGIN", "Error al insertar usuario Google en BD")
+                Toast.makeText(this, "Error al registrar usuario", Toast.LENGTH_SHORT).show()
             }
-            guardarEnPrefs(nuevoUsuario)
 
         } else {
             val usuarioExistente = dao.obtenerPorCorreo(email)
-            val usuarioActualizado = usuarioExistente?.copy(
-                nombre = nombre,
-                urlFoto = fotoPathLocal
-            )
-            if (usuarioActualizado != null) {
+
+            if (usuarioExistente != null) {
+                val usuarioActualizado = usuarioExistente.copy(
+                    nombre = nombre,
+                    urlFoto = fotoPathLocal
+                )
                 dao.actualizar(usuarioActualizado)
+
                 Log.i("GOOGLE_LOGIN", "Usuario Google actualizado en BD")
                 guardarEnPrefs(usuarioActualizado)
+
+                Toast.makeText(this, "Bienvenido, $nombre", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, DashboardActivity::class.java))
+                finish()
+            } else {
+                Log.e("GOOGLE_LOGIN", "No se pudo obtener usuario existente tras comprobar existencia")
+                Toast.makeText(this, "Error al acceder al usuario", Toast.LENGTH_SHORT).show()
             }
         }
-
-        Toast.makeText(this, "Bienvenido, $nombre", Toast.LENGTH_SHORT).show()
-        startActivity(Intent(this, DashboardActivity::class.java))
-        finish()
     }
+
 
     private fun guardarEnPrefs(usuario: Usuario) {
         val prefs = getSharedPreferences("MyRoomyPrefs", MODE_PRIVATE)
         prefs.edit()
+            .putInt("usuario_id", usuario.id)
             .putString("usuario_correo", usuario.correo)
             .putString("usuario_nombre", usuario.nombre)
             .putString("usuario_foto", usuario.urlFoto)
             .putString("usuario_tipo", usuario.tipo.name)
             .apply()
     }
+
 }

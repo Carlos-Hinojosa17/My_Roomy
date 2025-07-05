@@ -13,5 +13,10 @@ data class Reserva(
     val fechaSalida: String,
     val total: Double = 0.0,
     val metodoPago: String = "",
-    val cantidadPersonas: Int = 1
+    val cantidadPersonas: Int = 1,
+    // Estos vienen del JOIN
+    val nombreUsuario: String = "",
+    val urlFotoUsuario: String = "",
+    val nombreHabitacion: String = "",
+    val precio: Double = 0.0
 ) : Serializable

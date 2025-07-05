@@ -23,11 +23,21 @@ class ReservaDAO(context: Context) {
         }
         return db.insert("reservas", null, values)
     }
-
-    fun obtenerPendientes(): List<Reserva> {
+    fun obtenerPorUsuario(idUsuario: Int): List<Reserva> {
         val db = dbHelper.readableDatabase
         val lista = mutableListOf<Reserva>()
-        val cursor = db.rawQuery("SELECT * FROM reservas WHERE estado = 'Pendiente'", null)
+
+        val query = """
+        SELECT r.*, 
+               h.nombre AS nombre_habitacion, 
+               h.precio AS precio_habitacion
+        FROM reservas r
+        INNER JOIN habitaciones h ON r.id_habitacion = h.id
+        WHERE r.id_usuario = ?
+        ORDER BY r.fecha_solicitud DESC
+    """
+
+        val cursor = db.rawQuery(query, arrayOf(idUsuario.toString()))
 
         while (cursor.moveToNext()) {
             lista.add(
@@ -42,19 +52,82 @@ class ReservaDAO(context: Context) {
                     fechaSalida = cursor.getString(cursor.getColumnIndexOrThrow("fecha_salida")),
                     total = cursor.getDouble(cursor.getColumnIndexOrThrow("total")),
                     metodoPago = cursor.getString(cursor.getColumnIndexOrThrow("metodo_pago")),
-                    cantidadPersonas = cursor.getInt(cursor.getColumnIndexOrThrow("cantidad_personas"))
+                    cantidadPersonas = cursor.getInt(cursor.getColumnIndexOrThrow("cantidad_personas")),
+                    nombreUsuario = "", // no lo necesitas aquí
+                    urlFotoUsuario = "", // no lo necesitas aquí
+                    nombreHabitacion = cursor.getString(cursor.getColumnIndexOrThrow("nombre_habitacion")),
+                    precio = cursor.getDouble(cursor.getColumnIndexOrThrow("precio_habitacion"))
                 )
             )
         }
+
+        cursor.close()
+        return lista
+    }
+    fun listarTodas(): List<Reserva> {
+        val query = """
+            SELECT r.*, 
+                   u.nombre AS nombre_usuario, 
+                   u.urlFoto AS url_foto_usuario, 
+                   h.nombre AS nombre_habitacion, 
+                   h.precio AS precio_habitacion
+            FROM reservas r
+            INNER JOIN usuarios u ON r.id_usuario = u.id
+            INNER JOIN habitaciones h ON r.id_habitacion = h.id
+            ORDER BY r.fecha_solicitud DESC
+        """
+        return ejecutarConsulta(query, emptyArray())
+    }
+    fun listarPorEstado(estado: String): List<Reserva> {
+        val query = """
+            SELECT r.*, 
+                   u.nombre AS nombre_usuario, 
+                   u.urlFoto AS url_foto_usuario, 
+                   h.nombre AS nombre_habitacion, 
+                   h.precio AS precio_habitacion
+            FROM reservas r
+            INNER JOIN usuarios u ON r.id_usuario = u.id
+            INNER JOIN habitaciones h ON r.id_habitacion = h.id
+            WHERE r.estado = ?
+            ORDER BY r.fecha_solicitud DESC
+        """
+        return ejecutarConsulta(query, arrayOf(estado))
+    }
+    private fun ejecutarConsulta(query: String, args: Array<String>): List<Reserva> {
+        val db = dbHelper.readableDatabase
+        val lista = mutableListOf<Reserva>()
+        val cursor = db.rawQuery(query, args)
+
+        while (cursor.moveToNext()) {
+            lista.add(
+                Reserva(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    idUsuario = cursor.getInt(cursor.getColumnIndexOrThrow("id_usuario")),
+                    idHabitacion = cursor.getInt(cursor.getColumnIndexOrThrow("id_habitacion")),
+                    fechaSolicitud = cursor.getString(cursor.getColumnIndexOrThrow("fecha_solicitud")),
+                    estado = cursor.getString(cursor.getColumnIndexOrThrow("estado")),
+                    comentario = cursor.getString(cursor.getColumnIndexOrThrow("comentario")),
+                    fechaIngreso = cursor.getString(cursor.getColumnIndexOrThrow("fecha_ingreso")),
+                    fechaSalida = cursor.getString(cursor.getColumnIndexOrThrow("fecha_salida")),
+                    total = cursor.getDouble(cursor.getColumnIndexOrThrow("total")),
+                    metodoPago = cursor.getString(cursor.getColumnIndexOrThrow("metodo_pago")),
+                    cantidadPersonas = cursor.getInt(cursor.getColumnIndexOrThrow("cantidad_personas")),
+                    nombreUsuario = cursor.getString(cursor.getColumnIndexOrThrow("nombre_usuario")),
+                    urlFotoUsuario = cursor.getString(cursor.getColumnIndexOrThrow("url_foto_usuario")),
+                    nombreHabitacion = cursor.getString(cursor.getColumnIndexOrThrow("nombre_habitacion")),
+                    precio = cursor.getDouble(cursor.getColumnIndexOrThrow("precio_habitacion"))
+                )
+            )
+        }
+
         cursor.close()
         return lista
     }
 
-    fun actualizarEstado(idReserva: Int, nuevoEstado: String, comentario: String = ""): Int {
+    fun actualizarEstado(idReserva: Int, nuevoEstado: String): Int {
         val db = dbHelper.writableDatabase
         val values = ContentValues().apply {
             put("estado", nuevoEstado)
-            put("comentario", comentario)
         }
         return db.update("reservas", values, "id = ?", arrayOf(idReserva.toString()))
     }

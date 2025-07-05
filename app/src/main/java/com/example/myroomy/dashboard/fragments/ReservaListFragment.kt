@@ -4,17 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myroomy.R
 import com.example.myroomy.dashboard.adapters.ReservaAdapter
 import com.example.myroomy.dashboard.database.ReservaDAO
-import com.example.myroomy.dashboard.models.Reserva
+
 
 class ReservaListFragment : Fragment() {
 
     private lateinit var dao: ReservaDAO
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var spinner: Spinner
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,32 +26,39 @@ class ReservaListFragment : Fragment() {
     ): View {
         dao = ReservaDAO(requireContext())
         val view = inflater.inflate(R.layout.fragment_reserva_list, container, false)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerReservas)
+        recyclerView = view.findViewById(R.id.recyclerReservas)
         recyclerView.layoutManager = LinearLayoutManager(context)
+        spinner = view.findViewById(R.id.spinnerFiltro)
 
-        val lista = dao.obtenerPendientes()
-        val adapter = ReservaAdapter(lista) { reserva, accion ->
-            if (accion == "aceptar") {
-                dao.actualizarEstado(reserva.id, "Aceptada", "Aprobado por el admin")
-            } else if (accion == "rechazar") {
-                dao.actualizarEstado(reserva.id, "Rechazada", "Rechazado por el admin")
+        val filtros = listOf("Pendiente", "Aceptada", "Rechazada", "Todas")
+        spinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, filtros)
+
+        spinner.setSelection(0) // Por defecto "Pendiente"
+        spinner.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
+                cargarReservas(filtros[position])
             }
-            // Refresh
-            recyclerView.adapter = ReservaAdapter(dao.obtenerPendientes(), this::onAccion)
-        }
 
-        recyclerView.adapter = adapter
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
+        })
 
         return view
     }
 
-    private fun onAccion(reserva: Reserva, accion: String) {
-        if (accion == "aceptar") {
-            dao.actualizarEstado(reserva.id, "Aceptada", "Aprobado por el admin")
-        } else if (accion == "rechazar") {
-            dao.actualizarEstado(reserva.id, "Rechazada", "Rechazado por el admin")
+    private fun cargarReservas(estado: String) {
+        val lista = when (estado) {
+            "Todas" -> dao.listarTodas()
+            else -> dao.listarPorEstado(estado)
         }
-        view?.findViewById<RecyclerView>(R.id.recyclerReservas)?.adapter =
-            ReservaAdapter(dao.obtenerPendientes(), this::onAccion)
+
+        recyclerView.adapter = ReservaAdapter(lista) { reserva, accion ->
+            if (accion == "aceptar") {
+                dao.actualizarEstado(reserva.id, "Aceptada")
+            } else if (accion == "rechazar") {
+                dao.actualizarEstado(reserva.id, "Rechazada")
+            }
+
+            cargarReservas(spinner.selectedItem.toString())
+        }
     }
 }

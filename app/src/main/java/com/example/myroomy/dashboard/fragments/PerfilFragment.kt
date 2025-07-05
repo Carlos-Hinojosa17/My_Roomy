@@ -33,7 +33,7 @@ class PerfilFragment : Fragment() {
         if (!fotoUrl.isNullOrEmpty()) {
             Glide.with(this)
                 .load(fotoUrl)
-                .placeholder(R.drawable.ic_person_placeholder) // ícono por defecto
+                .placeholder(R.drawable.ic_person_placeholder)
                 .into(imgFoto)
         } else {
             imgFoto.setImageResource(R.drawable.ic_person_placeholder)
