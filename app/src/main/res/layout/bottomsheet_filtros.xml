@@ -20,12 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switchDisponible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Solo disponibles"
-        android:layout_marginTop="16dp" />
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAplicar"

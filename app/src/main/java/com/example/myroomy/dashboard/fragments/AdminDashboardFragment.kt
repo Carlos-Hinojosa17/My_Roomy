@@ -2,21 +2,24 @@ package com.example.myroomy.dashboard.fragments
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.myroomy.R
 import com.example.myroomy.dashboard.database.HabitacionDAO
-import com.example.myroomy.dashboard.database.ReservaDAO
 import com.example.myroomy.dashboard.database.UsuarioDAO
 import com.example.myroomy.databinding.FragmentAdminDashboardBinding
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AdminDashboardFragment : Fragment() {
 
@@ -36,26 +39,27 @@ class AdminDashboardFragment : Fragment() {
 
         lifecycleScope.launch {
             val daoHabitacion = HabitacionDAO(requireContext())
-            val daoReserva = ReservaDAO(requireContext())
             val daoUsuario = UsuarioDAO(requireContext())
 
-            val habitaciones = withContext(Dispatchers.IO) { daoHabitacion.obtenerTodos() }
-            val reservas = withContext(Dispatchers.IO) { daoReserva.listarTodas() }
-            val usuarios = withContext(Dispatchers.IO) { daoUsuario.obtenerTodos() }
+            val habitacionesDeferred = async(Dispatchers.IO) { daoHabitacion.obtenerTodos() }
+            val habitacionesOcupadasDeferred = async(Dispatchers.IO) { daoHabitacion.obtenerPorEstado("Ocupada") }
+            val usuariosDeferred = async(Dispatchers.IO) { daoUsuario.obtenerTodos() }
 
-            // Actualizar textos
-            binding.txtHabitacionesCount.text = "${habitaciones.size}"
-            binding.txtReservasCount.text = "${reservas.size}"
-            binding.txtUsuariosCount.text = "${usuarios.size}"
+            val habitaciones = habitacionesDeferred.await()
+            val habitacionesOcupadas = habitacionesOcupadasDeferred.await()
+            val usuarios = usuariosDeferred.await()
 
-            // Calcular ocupación (porcentaje simple)
-            val ocupadas = reservas.size
-            val total = if (habitaciones.isNotEmpty()) habitaciones.size else 1
-            val porcentajeOcupacion = (ocupadas * 100f) / total
+            Log.d("Dashboard", "Habitaciones: ${habitaciones.size}, Ocupadas: ${habitacionesOcupadas.size}, Usuarios: ${usuarios.size}")
 
-            binding.txtOcupacionLabel.text = "Ocupación: ${porcentajeOcupacion.toInt()}%"
+            binding.txtHabitacionesCount.text = habitaciones.size.toString()
+            binding.txtReservasCount.text = habitacionesOcupadas.size.toString()
+            binding.txtUsuariosCount.text = usuarios.size.toString()
 
-            // Configurar el pie chart
+            val total = habitaciones.size.takeIf { it > 0 } ?: 1
+            val porcentajeOcupacion = (habitacionesOcupadas.size * 100f) / total
+
+            binding.txtOcupacionLabel.text = "Ocupación: %.1f%%".format(porcentajeOcupacion)
+
             setupPieChart(porcentajeOcupacion)
         }
     }
@@ -66,10 +70,15 @@ class AdminDashboardFragment : Fragment() {
             PieEntry(100f - porcentaje, "Libres")
         )
 
-        val dataSet = PieDataSet(entries, "")
-        dataSet.colors = listOf(Color.parseColor("#3F51B5"), Color.LTGRAY)
-        dataSet.valueTextColor = Color.WHITE
-        dataSet.valueTextSize = 14f
+        val dataSet = PieDataSet(entries, "").apply {
+            colors = listOf(
+                ContextCompat.getColor(requireContext(), R.color.red), // Ocupadas
+                ContextCompat.getColor(requireContext(), R.color.green) // Libres
+            )
+            valueTextColor = Color.WHITE
+            valueTextSize = 14f
+            sliceSpace = 2f
+        }
 
         val data = PieData(dataSet)
 
@@ -81,7 +90,7 @@ class AdminDashboardFragment : Fragment() {
             setHoleColor(Color.TRANSPARENT)
             setCenterText("${porcentaje.toInt()}%")
             setCenterTextSize(18f)
-            animateY(1000)
+            animateY(1000, Easing.EaseInOutQuad)
             invalidate()
         }
     }

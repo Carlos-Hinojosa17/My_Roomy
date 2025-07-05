@@ -16,6 +16,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import android.widget.ArrayAdapter
+import com.example.myroomy.dashboard.database.HabitacionDAO
 
 class ReservaFormFragment : Fragment() {
 
@@ -122,11 +123,16 @@ class ReservaFormFragment : Fragment() {
 
         val idReserva = reservaDAO.insertar(reserva)
         if (idReserva != -1L) {
-            Toast.makeText(requireContext(), "Reserva confirmada", Toast.LENGTH_SHORT).show()
+
+            val habitacionDao = HabitacionDAO(requireContext())
+            habitacionDao.actualizarEstado(habitacionId, "Reservada")
+
+            Toast.makeText(requireContext(), "Reserva enviada para aprobación", Toast.LENGTH_SHORT).show()
             requireActivity().supportFragmentManager.popBackStack()
         } else {
             Toast.makeText(requireContext(), "Error al registrar la reserva", Toast.LENGTH_SHORT).show()
         }
+
     }
 
 }

@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myroomy.R
+
 import com.example.myroomy.dashboard.adapters.HabitacionAdapter
 import com.example.myroomy.dashboard.database.HabitacionDAO
 import com.example.myroomy.dashboard.models.Habitacion
@@ -24,6 +26,9 @@ class HabitacionListFragment : Fragment() {
     private lateinit var habitacionDAO: HabitacionDAO
     private lateinit var adapter: HabitacionAdapter
     private val listaHabitaciones = mutableListOf<Habitacion>()
+    private lateinit var spinnerFiltroHabitacion: Spinner  // Referencia al Spinner
+
+    private var estadoFiltro: String = "Todas"  // Filtro inicial
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +42,22 @@ class HabitacionListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         habitacionDAO = HabitacionDAO(requireContext())
+
+        // Configurar el Spinner
+        spinnerFiltroHabitacion = binding.spinnerFiltroHabitacion
+        val filtros = listOf("Todas", "Ocupada", "Disponible","Reservada","Mantenimiento")  // Puedes agregar más filtros si lo necesitas
+        val adapterSpinner = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, filtros)
+        spinnerFiltroHabitacion.adapter = adapterSpinner
+
+        spinnerFiltroHabitacion.setSelection(0)  // Seleccionar "Todas" como opción inicial
+        spinnerFiltroHabitacion.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
+                estadoFiltro = filtros[position]  // Cambiar el filtro según la selección
+                cargarHabitaciones()  // Recargar las habitaciones con el filtro actualizado
+            }
+
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
+        })
 
         adapter = HabitacionAdapter(
             listaHabitaciones,
@@ -69,20 +90,30 @@ class HabitacionListFragment : Fragment() {
         cargarHabitaciones()
     }
 
+    // Lógica para cargar las habitaciones con el filtro seleccionado
     private fun cargarHabitaciones() {
         listaHabitaciones.clear()
-        listaHabitaciones.addAll(habitacionDAO.obtenerTodos())
+
+        // Filtrar según el estado seleccionado en el Spinner
+        val habitacionesFiltradas = when (estadoFiltro) {
+            "Ocupada" -> habitacionDAO.obtenerPorEstado("Ocupada")
+            "Disponible" -> habitacionDAO.obtenerPorEstado("Disponible")
+            "Reservada" -> habitacionDAO.obtenerPorEstado("Reservada")
+            "Mantenimiento" -> habitacionDAO.obtenerPorEstado("Mantenimiento")
+            else -> habitacionDAO.obtenerTodos()
+        }
+
+        listaHabitaciones.addAll(habitacionesFiltradas)
         adapter.notifyDataSetChanged()
         verificarListaVacia()
     }
+
 
     private fun confirmarEliminacion(habitacion: Habitacion) {
         AlertDialog.Builder(requireContext())
             .setTitle("¿Eliminar habitación?")
             .setMessage("¿Estás seguro de eliminar '${habitacion.nombre}'?")
-            .setPositiveButton("Sí") { _, _ ->
-                eliminarHabitacion(habitacion)
-            }
+            .setPositiveButton("Sí") { _, _ -> eliminarHabitacion(habitacion) }
             .setNegativeButton("Cancelar", null)
             .show()
     }

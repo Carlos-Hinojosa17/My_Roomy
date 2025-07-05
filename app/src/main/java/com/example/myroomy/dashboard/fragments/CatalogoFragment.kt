@@ -29,7 +29,6 @@ class CatalogoFragment : Fragment() {
     private var listaCategoriasSeleccionadas: List<String> = emptyList()
     private var precioMinSeleccionado: Float = 0f
     private var precioMaxSeleccionado: Float = 1000f
-    private var soloDisponiblesSeleccionado: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,8 +50,8 @@ class CatalogoFragment : Fragment() {
 
         binding.btnAbrirFiltros.setOnClickListener {
             val sheet = FiltroBottomSheetFragment.newInstance(listaHabitaciones)
-            sheet.setOnFiltroAplicadoListener { seleccionados, precioMin, precioMax, soloDisponibles ->
-                aplicarFiltros(seleccionados, precioMin, precioMax, soloDisponibles)
+            sheet.setOnFiltroAplicadoListener { seleccionados, precioMin, precioMax ->
+            aplicarFiltros(seleccionados, precioMin, precioMax)
             }
             sheet.show(parentFragmentManager, "FiltroBottomSheet")
         }
@@ -62,7 +61,8 @@ class CatalogoFragment : Fragment() {
             val habitaciones = withContext(Dispatchers.IO) {
                 dao.obtenerTodos()
             }
-            listaHabitaciones = habitaciones
+            // Filtramos solo disponibles desde el inicio
+            listaHabitaciones = habitaciones.filter { it.estado == "Disponible" }
             configurarDestacados()
             adapterCatalogo.submitList(listaHabitaciones)
         }
@@ -78,19 +78,16 @@ class CatalogoFragment : Fragment() {
     private fun aplicarFiltros(
         seleccionados: List<String>,
         precioMin: Float,
-        precioMax: Float,
-        soloDisponibles: Boolean
+        precioMax: Float
     ) {
         // Guardar estado actual
         listaCategoriasSeleccionadas = seleccionados
         precioMinSeleccionado = precioMin
         precioMaxSeleccionado = precioMax
-        soloDisponiblesSeleccionado = soloDisponibles
 
         val filtrado = listaHabitaciones.filter { hab ->
             (seleccionados.isEmpty() || seleccionados.contains(hab.categoria)) &&
-                    (hab.precio in precioMin..precioMax) &&
-                    (!soloDisponibles || hab.estado == "Disponible")
+                    (hab.precio in precioMin..precioMax)
         }
 
         adapterCatalogo.submitList(filtrado)
@@ -122,32 +119,17 @@ class CatalogoFragment : Fragment() {
             binding.chipGroupResumen.addView(chip)
         }
 
-        if (soloDisponiblesSeleccionado) {
-            val chip = Chip(requireContext()).apply {
-                text = "Solo disponibles"
-                isCloseIconVisible = true
-                setOnCloseIconClickListener {
-                    eliminarFiltroDisponibles()
-                }
-            }
-            binding.chipGroupResumen.addView(chip)
-        }
-
         binding.contadorFiltros.text = binding.chipGroupResumen.childCount.toString()
     }
 
     private fun eliminarFiltroCategoria(categoria: String) {
         val nuevasCategorias = listaCategoriasSeleccionadas.toMutableList()
         nuevasCategorias.remove(categoria)
-        aplicarFiltros(nuevasCategorias, precioMinSeleccionado, precioMaxSeleccionado, soloDisponiblesSeleccionado)
+        aplicarFiltros(nuevasCategorias, precioMinSeleccionado, precioMaxSeleccionado)
     }
 
     private fun eliminarFiltroPrecio() {
-        aplicarFiltros(listaCategoriasSeleccionadas, 0f, 1000f, soloDisponiblesSeleccionado)
-    }
-
-    private fun eliminarFiltroDisponibles() {
-        aplicarFiltros(listaCategoriasSeleccionadas, precioMinSeleccionado, precioMaxSeleccionado, false)
+        aplicarFiltros(listaCategoriasSeleccionadas, 0f, 1000f)
     }
 
     private fun mostrarDetalleReserva(habitacion: Habitacion) {

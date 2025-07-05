@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.example.myroomy.dashboard.models.Habitacion
 import com.example.myroomy.databinding.BottomsheetFiltrosBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,7 +15,7 @@ class FiltroBottomSheetFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     private var habitaciones: List<Habitacion> = emptyList()
-    private var onFiltroAplicado: ((List<String>, Float, Float, Boolean) -> Unit)? = null
+    private var onFiltroAplicado: ((List<String>, Float, Float) -> Unit)? = null
 
     companion object {
         fun newInstance(habitaciones: List<Habitacion>): FiltroBottomSheetFragment {
@@ -26,7 +25,7 @@ class FiltroBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    fun setOnFiltroAplicadoListener(listener: (List<String>, Float, Float, Boolean) -> Unit) {
+    fun setOnFiltroAplicadoListener(listener: (List<String>, Float, Float) -> Unit) {
         onFiltroAplicado = listener
     }
 
@@ -61,9 +60,8 @@ class FiltroBottomSheetFragment : BottomSheetDialogFragment() {
 
             val precioMin = binding.sliderPrecio.values[0]
             val precioMax = binding.sliderPrecio.values[1]
-            val soloDisponibles = binding.switchDisponible.isChecked
 
-            onFiltroAplicado?.invoke(seleccionados, precioMin, precioMax, soloDisponibles)
+            onFiltroAplicado?.invoke(seleccionados, precioMin, precioMax)
             dismiss()
         }
     }

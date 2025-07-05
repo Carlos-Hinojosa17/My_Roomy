@@ -200,6 +200,7 @@ class MainActivity : AppCompatActivity() {
             .putString("usuario_nombre", usuario.nombre)
             .putString("usuario_foto", usuario.urlFoto)
             .putString("usuario_tipo", usuario.tipo.name)
+            .putString("usuario_estado", if (usuario.estado == 1) "Activo" else "Inactivo")
             .apply()
     }
 
