@@ -43,8 +43,13 @@ class DetalleReservaBottomSheet : BottomSheetDialogFragment() {
             binding.txtDescripcion.text = hab.descripcion
 
             Glide.with(this)
-                .load(File(hab.imagen))
+                .load(
+                    if (hab.imagen.startsWith("http")) hab.imagen
+                    else File(hab.imagen)
+                )
+                .placeholder(R.drawable.ic_room)
                 .into(binding.imgDetalle)
+
 
             // Mostrar los servicios como chips
             binding.chipGroupServicios.removeAllViews()

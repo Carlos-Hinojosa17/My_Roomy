@@ -40,17 +40,28 @@ class HabitacionAdapter(
         holder.txtPrecio.text = "S/ ${"%.2f".format(h.precio)}"
 
         val context = holder.itemView.context
-        if (h.imagen.startsWith("/")) {
-            Glide.with(context)
-                .load(File(h.imagen))
-                .placeholder(R.drawable.ic_launcher_background)
-                .into(holder.img)
-        } else {
-            val idDrawable = context.resources.getIdentifier(
-                h.imagen, "drawable", context.packageName
-            )
-            holder.img.setImageResource(idDrawable.takeIf { it != 0 } ?: R.drawable.ic_launcher_background)
+        when {
+            h.imagen.startsWith("http") -> {
+                Glide.with(context)
+                    .load(h.imagen)
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(holder.img)
+            }
+            h.imagen.startsWith("/") -> {
+                Glide.with(context)
+                    .load(File(h.imagen))
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .into(holder.img)
+            }
+            else -> {
+                val idDrawable = context.resources.getIdentifier(
+                    h.imagen, "drawable", context.packageName
+                )
+                holder.img.setImageResource(idDrawable.takeIf { it != 0 } ?: R.drawable.ic_launcher_background)
+            }
         }
+
 
         holder.itemView.setOnClickListener { onItemClick(h) }
         holder.btnEliminar.setOnClickListener { onEliminarClick(h) }

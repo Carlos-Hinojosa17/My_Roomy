@@ -67,7 +67,22 @@ class HabitacionFormFragment : Fragment() {
             (binding.spinnerCategoria as? MaterialAutoCompleteTextView)?.setText(h.categoria, false)
             (binding.spinnerEstado as? MaterialAutoCompleteTextView)?.setText(h.estado, false)
             rutaImagenGuardada = h.imagen
-            Glide.with(this).load(File(h.imagen)).into(binding.previewImagen)
+            if (h.imagen.startsWith("http")) {
+                // Imagen de una URL
+                Glide.with(this)
+                    .load(h.imagen)
+                    .placeholder(android.R.color.darker_gray)
+                    .error(android.R.color.darker_gray)
+                    .into(binding.previewImagen)
+            } else {
+                // Imagen local
+                Glide.with(this)
+                    .load(File(h.imagen))
+                    .placeholder(android.R.color.darker_gray)
+                    .error(android.R.color.darker_gray)
+                    .into(binding.previewImagen)
+            }
+
             h.servicios.forEach { servicio ->
                 val chip = crearChip(servicio)
                 binding.chipGroupServicios.addView(chip)

@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class AdminDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "myroomy.db", null, 1) { // Versión incrementada por nueva tabla
+    SQLiteOpenHelper(context, "myroomy.db", null, 2) { // Versión incrementada por nueva tabla
 
     override fun onCreate(db: SQLiteDatabase) {
         // Usuarios
@@ -41,16 +41,36 @@ class AdminDatabaseHelper(context: Context) :
             )
         """)
         db.execSQL("""
-            INSERT INTO habitaciones (nombre, descripcion, categoria, imagen, estado, precio, servicios, numeroHabitacion, piso) VALUES
-            ('Suite Ejecutiva', 'Suite con vista al mar y jacuzzi privado', 'Suite', 'ruta_suite1.jpg', 'Disponible', 350.0, 'Jacuzzi,TV,Wifi', '201', 2),
-            ('Suite Deluxe', 'Suite de lujo con sala de estar', 'Suite', 'ruta_suite2.jpg', 'Ocupada', 400.0, 'TV,Wifi,Minibar', '202', 2),
-            ('Habitación Doble A', 'Habitación doble estándar', 'Doble', 'ruta_doble1.jpg', 'Disponible', 180.0, 'TV,Wifi', '101', 1),
-            ('Habitación Doble B', 'Habitación doble con balcón', 'Doble', 'ruta_doble2.jpg', 'Mantenimiento', 200.0, 'TV,Wifi,Balcón', '102', 1),
-            ('Habitación Individual A', 'Habitación individual económica', 'Individual', 'ruta_individual1.jpg', 'Disponible', 120.0, 'Wifi', '301', 3),
-            ('Habitación Individual B', 'Habitación individual con escritorio', 'Individual', 'ruta_individual2.jpg', 'Ocupada', 130.0, 'Wifi,Escritorio', '302', 3),
-            ('Suite Presidencial', 'La mejor suite del hotel, piso alto', 'Suite', 'ruta_suite3.jpg', 'Disponible', 500.0, 'Jacuzzi,TV,Wifi,Minibar', '401', 4),
-            ('Doble Familiar', 'Habitación doble ideal para familias', 'Doble', 'ruta_doble3.jpg', 'Disponible', 220.0, 'TV,Wifi,Cuna', '103', 1),
-            ('Individual Compacta', 'Habitación compacta para viajeros', 'Individual', 'ruta_individual3.jpg', 'Mantenimiento', 110.0, 'Wifi', '303', 3)
+           INSERT INTO habitaciones (
+               nombre, descripcion, categoria, imagen, estado, precio, servicios, numeroHabitacion, piso
+           ) VALUES
+           ('Suite Ejecutiva', 'Suite con vista al mar y jacuzzi privado', 'Suite',
+            'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2', 'Disponible', 350.0,
+            'Jacuzzi,TV,Wifi', '201', 2),
+           ('Suite Deluxe', 'Suite de lujo con sala de estar', 'Suite',
+            'https://images.unsplash.com/photo-1600585154340-be6161a56a0c', 'Ocupada', 400.0,
+            'TV,Wifi,Minibar', '202', 2),
+            ('Habitación Doble A', 'Habitación doble estándar', 'Doble',
+             'https://images.pexels.com/photos/271619/pexels-photo-271619.jpeg', 
+             'Disponible', 180.0, 'TV,Wifi', '101', 1),
+            ('Habitación Doble B', 'Habitación doble con balcón', 'Doble',
+             'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg', 'Mantenimiento', 200.0,
+             'TV,Wifi,Balcón', '102', 1),
+            ('Habitación Individual A', 'Habitación individual económica', 'Individual',
+            'https://images.pexels.com/photos/271743/pexels-photo-271743.jpeg', 'Disponible', 120.0,
+             'Wifi', '301', 3),
+            ('Habitación Individual B', 'Habitación individual con escritorio', 'Individual',
+             'https://images.pexels.com/photos/271671/pexels-photo-271671.jpeg', 'Ocupada', 130.0,
+             'Wifi,Escritorio', '302', 3),
+            ('Suite Presidencial', 'La mejor suite del hotel, piso alto', 'Suite',
+             'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba', 'Disponible', 500.0,
+             'Jacuzzi,TV,Wifi,Minibar', '401', 4),
+            ('Doble Familiar', 'Habitación doble ideal para familias', 'Doble',
+             'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg', 'Disponible', 220.0,
+             'TV,Wifi,Cuna', '103', 1),
+            ('Individual Compacta', 'Habitación compacta para viajeros', 'Individual',
+             'https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg', 'Mantenimiento', 110.0,
+             'Wifi', '303', 3);
         """)
 
         // Reservas

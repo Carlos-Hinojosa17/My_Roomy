@@ -26,9 +26,9 @@ class HabitacionListFragment : Fragment() {
     private lateinit var habitacionDAO: HabitacionDAO
     private lateinit var adapter: HabitacionAdapter
     private val listaHabitaciones = mutableListOf<Habitacion>()
-    private lateinit var spinnerFiltroHabitacion: Spinner  // Referencia al Spinner
+    private lateinit var spinnerFiltroHabitacion: Spinner
 
-    private var estadoFiltro: String = "Todas"  // Filtro inicial
+    private var estadoFiltro: String = "Todas"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,15 +49,15 @@ class HabitacionListFragment : Fragment() {
         val adapterSpinner = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, filtros)
         spinnerFiltroHabitacion.adapter = adapterSpinner
 
-        spinnerFiltroHabitacion.setSelection(0)  // Seleccionar "Todas" como opción inicial
-        spinnerFiltroHabitacion.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
+        spinnerFiltroHabitacion.setSelection(0)
+        spinnerFiltroHabitacion.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
-                estadoFiltro = filtros[position]  // Cambiar el filtro según la selección
-                cargarHabitaciones()  // Recargar las habitaciones con el filtro actualizado
+                estadoFiltro = filtros[position]
+                cargarHabitaciones()
             }
 
             override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
-        })
+        }
 
         adapter = HabitacionAdapter(
             listaHabitaciones,

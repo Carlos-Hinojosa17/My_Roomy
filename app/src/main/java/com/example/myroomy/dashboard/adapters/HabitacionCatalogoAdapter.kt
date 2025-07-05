@@ -23,14 +23,22 @@ class HabitacionCatalogoAdapter(
             binding.txtEstadoHabitacion.text = habitacion.estado
 
             Glide.with(binding.root.context)
-                .load(habitacion.imagen)
+                .load(
+                    if (habitacion.imagen.startsWith("http", true)) {
+                        habitacion.imagen
+                    } else {
+                        java.io.File(habitacion.imagen)
+                    }
+                )
                 .placeholder(R.drawable.ic_room)
+                .error(R.drawable.ic_room)
                 .into(binding.imgHabitacion)
 
             binding.root.setOnClickListener {
                 onClick(habitacion)
             }
         }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
