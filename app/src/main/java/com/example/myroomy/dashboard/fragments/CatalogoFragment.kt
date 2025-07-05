@@ -25,6 +25,12 @@ class CatalogoFragment : Fragment() {
     private lateinit var adapterCatalogo: HabitacionCatalogoAdapter
     private var listaHabitaciones: List<Habitacion> = emptyList()
 
+    // Estado actual de filtros
+    private var listaCategoriasSeleccionadas: List<String> = emptyList()
+    private var precioMinSeleccionado: Float = 0f
+    private var precioMaxSeleccionado: Float = 1000f
+    private var soloDisponiblesSeleccionado: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -43,6 +49,14 @@ class CatalogoFragment : Fragment() {
         binding.recyclerCatalogo.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerCatalogo.adapter = adapterCatalogo
 
+        binding.btnAbrirFiltros.setOnClickListener {
+            val sheet = FiltroBottomSheetFragment.newInstance(listaHabitaciones)
+            sheet.setOnFiltroAplicadoListener { seleccionados, precioMin, precioMax, soloDisponibles ->
+                aplicarFiltros(seleccionados, precioMin, precioMax, soloDisponibles)
+            }
+            sheet.show(parentFragmentManager, "FiltroBottomSheet")
+        }
+
         lifecycleScope.launch {
             val dao = HabitacionDAO(requireContext())
             val habitaciones = withContext(Dispatchers.IO) {
@@ -50,7 +64,6 @@ class CatalogoFragment : Fragment() {
             }
             listaHabitaciones = habitaciones
             configurarDestacados()
-            configurarFiltros()
             adapterCatalogo.submitList(listaHabitaciones)
         }
     }
@@ -62,35 +75,84 @@ class CatalogoFragment : Fragment() {
         }
     }
 
-    private fun mostrarDetalleReserva(habitacion: Habitacion) {
-        val bottomSheet = DetalleReservaBottomSheet.nuevaInstancia(habitacion)
-        bottomSheet.show(parentFragmentManager, "DetalleReserva")
-    }
+    private fun aplicarFiltros(
+        seleccionados: List<String>,
+        precioMin: Float,
+        precioMax: Float,
+        soloDisponibles: Boolean
+    ) {
+        // Guardar estado actual
+        listaCategoriasSeleccionadas = seleccionados
+        precioMinSeleccionado = precioMin
+        precioMaxSeleccionado = precioMax
+        soloDisponiblesSeleccionado = soloDisponibles
 
-    private fun configurarFiltros() {
-        val categorias = listaHabitaciones.map { it.categoria }.distinct()
-        categorias.forEach { cat ->
-            val chip = Chip(requireContext()).apply {
-                text = cat
-                isCheckable = true
-                setOnCheckedChangeListener { _, _ -> aplicarFiltros() }
-            }
-            binding.chipGroupFiltros.addView(chip)
-        }
-    }
-
-    private fun aplicarFiltros() {
-        val seleccionados = binding.chipGroupFiltros.checkedChipIds.mapNotNull { id ->
-            binding.chipGroupFiltros.findViewById<Chip>(id)?.text?.toString()
-        }
-
-        val filtrado = if (seleccionados.isEmpty()) {
-            listaHabitaciones
-        } else {
-            listaHabitaciones.filter { seleccionados.contains(it.categoria) }
+        val filtrado = listaHabitaciones.filter { hab ->
+            (seleccionados.isEmpty() || seleccionados.contains(hab.categoria)) &&
+                    (hab.precio in precioMin..precioMax) &&
+                    (!soloDisponibles || hab.estado == "Disponible")
         }
 
         adapterCatalogo.submitList(filtrado)
+        actualizarResumenFiltros()
+    }
+
+    private fun actualizarResumenFiltros() {
+        binding.chipGroupResumen.removeAllViews()
+
+        listaCategoriasSeleccionadas.forEach { categoria ->
+            val chip = Chip(requireContext()).apply {
+                text = categoria
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    eliminarFiltroCategoria(categoria)
+                }
+            }
+            binding.chipGroupResumen.addView(chip)
+        }
+
+        if (precioMinSeleccionado > 0f || precioMaxSeleccionado < 1000f) {
+            val chip = Chip(requireContext()).apply {
+                text = "Precio: ${precioMinSeleccionado.toInt()} - ${precioMaxSeleccionado.toInt()}"
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    eliminarFiltroPrecio()
+                }
+            }
+            binding.chipGroupResumen.addView(chip)
+        }
+
+        if (soloDisponiblesSeleccionado) {
+            val chip = Chip(requireContext()).apply {
+                text = "Solo disponibles"
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    eliminarFiltroDisponibles()
+                }
+            }
+            binding.chipGroupResumen.addView(chip)
+        }
+
+        binding.contadorFiltros.text = binding.chipGroupResumen.childCount.toString()
+    }
+
+    private fun eliminarFiltroCategoria(categoria: String) {
+        val nuevasCategorias = listaCategoriasSeleccionadas.toMutableList()
+        nuevasCategorias.remove(categoria)
+        aplicarFiltros(nuevasCategorias, precioMinSeleccionado, precioMaxSeleccionado, soloDisponiblesSeleccionado)
+    }
+
+    private fun eliminarFiltroPrecio() {
+        aplicarFiltros(listaCategoriasSeleccionadas, 0f, 1000f, soloDisponiblesSeleccionado)
+    }
+
+    private fun eliminarFiltroDisponibles() {
+        aplicarFiltros(listaCategoriasSeleccionadas, precioMinSeleccionado, precioMaxSeleccionado, false)
+    }
+
+    private fun mostrarDetalleReserva(habitacion: Habitacion) {
+        val bottomSheet = DetalleReservaBottomSheet.nuevaInstancia(habitacion)
+        bottomSheet.show(parentFragmentManager, "DetalleReserva")
     }
 
     override fun onDestroyView() {

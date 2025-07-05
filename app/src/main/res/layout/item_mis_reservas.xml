@@ -19,8 +19,7 @@
             android:layout_height="wrap_content"
             android:text="Suite Ejecutiva"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtMisReservaFechas"

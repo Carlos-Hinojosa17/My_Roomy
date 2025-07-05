@@ -15,17 +15,6 @@
         android:icon="@drawable/ic_account" />
 
     <item
-        android:id="@+id/nav_favoritos"
-        android:title="Favoritos"
-        android:icon="@drawable/ic_favorite" />
-
-    <item
-        android:id="@+id/nav_notificaciones"
-        android:title="Notificaciones"
-        android:icon="@drawable/ic_notifications" />
-
-
-    <item
         android:id="@+id/nav_cerrar_sesion"
         android:title="Cerrar sesión"
         android:icon="@drawable/ic_logout" />

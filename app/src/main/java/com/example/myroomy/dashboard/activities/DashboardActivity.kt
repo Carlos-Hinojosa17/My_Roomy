@@ -53,7 +53,7 @@ class DashboardActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             val initialFragment = if (tipoUsuario == TipoUsuario.ADMIN.name) {
-                HabitacionListFragment()
+                AdminDashboardFragment()
             } else {
                 CatalogoFragment()
             }
@@ -67,6 +67,7 @@ class DashboardActivity : AppCompatActivity() {
             drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
                 override fun onDrawerClosed(drawerView: View) {
                     when (item.itemId) {
+                        R.id.nav_dashboard -> replaceFragment(AdminDashboardFragment())
                         R.id.nav_gestion_habitaciones -> replaceFragment(HabitacionListFragment())
                         R.id.nav_gestion_reservas -> replaceFragment(ReservaListFragment())
                         R.id.nav_catalogo -> replaceFragment(CatalogoFragment())
