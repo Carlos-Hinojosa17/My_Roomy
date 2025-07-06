@@ -11,10 +11,10 @@ import com.example.myroomy.R
 import com.example.myroomy.dashboard.adapters.MisReservasAdapter
 import com.example.myroomy.dashboard.database.ReservaDAO
 
-
 class MisReservasFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var layoutVacio: View
     private lateinit var adapter: MisReservasAdapter
 
     override fun onCreateView(
@@ -24,6 +24,8 @@ class MisReservasFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mis_reservas, container, false)
 
         recyclerView = view.findViewById(R.id.recyclerMisReservas)
+        layoutVacio = view.findViewById(R.id.layoutVacio)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val prefs = requireContext().getSharedPreferences("MyRoomyPrefs", 0)
@@ -33,13 +35,21 @@ class MisReservasFragment : Fragment() {
             val dao = ReservaDAO(requireContext())
             val listaReservas = dao.obtenerPorUsuario(idUsuario)
 
-            adapter = MisReservasAdapter(listaReservas)
-            recyclerView.adapter = adapter
+            if (listaReservas.isNotEmpty()) {
+                adapter = MisReservasAdapter(listaReservas)
+                recyclerView.adapter = adapter
+                recyclerView.visibility = View.VISIBLE
+                layoutVacio.visibility = View.GONE
+            } else {
+                recyclerView.visibility = View.GONE
+                layoutVacio.visibility = View.VISIBLE
+            }
         } else {
-            // Aquí puedes mostrar un mensaje o dejar vacío
+            // Usuario inválido: mostramos vacío
+            recyclerView.visibility = View.GONE
+            layoutVacio.visibility = View.VISIBLE
         }
 
         return view
     }
 }
-
