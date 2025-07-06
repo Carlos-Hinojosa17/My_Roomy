@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class AdminDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "myroomy.db", null, 2) { // Versión incrementada por nueva tabla
+    SQLiteOpenHelper(context, "myroomy.db", null, 4) { // Versión incrementada por nueva tabla
 
     override fun onCreate(db: SQLiteDatabase) {
         // Usuarios

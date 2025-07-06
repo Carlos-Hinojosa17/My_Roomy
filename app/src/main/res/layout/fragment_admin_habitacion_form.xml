@@ -48,8 +48,7 @@
                     android:layout_height="40dp"
                     android:layout_gravity="bottom|end"
                     android:layout_margin="6dp"
-                    android:background="@drawable/bg_round_button"
-                    android:backgroundTint="@color/purple_500"
+                    android:background="@drawable/button_gradient"
                     android:contentDescription="Seleccionar imagen"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_image"
@@ -213,6 +212,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Servicios -->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -221,66 +221,38 @@
             android:textSize="16sp"
             android:layout_marginTop="16dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="4dp">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:hint="Agregar servicio"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                app:boxBackgroundMode="outline">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputServicioUnitario"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnAgregarServicio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:contentDescription="Agregar servicio"
-                android:clickable="true"
-                android:focusable="true"
-                app:srcCompat="@drawable/ic_add"
-                app:tint="@android:color/white"
-                app:backgroundTint="@color/purple_500"
-                app:fabSize="mini" />
-        </LinearLayout>
-
-
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupServicios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:singleLine="false"
-            app:chipSpacing="8dp"
-            app:lineSpacing="4dp" />
+            app:chipSpacingHorizontal="6dp"
+            app:chipSpacingVertical="2dp" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAgregarServicio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agregar servicio"
+            app:icon="@drawable/ic_add"
+            app:backgroundTint="@color/colorPrecio"
+            app:iconGravity="textStart"
+            android:layout_marginTop="8dp" />
 
 
         <!-- Botón Guardar -->
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGuardarHabitacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Guardar habitación"
             android:textAllCaps="false"
+            android:background="@drawable/button_gradient"
             android:textStyle="bold"
             android:icon="@drawable/ic_save"
             app:iconPadding="8dp"
-            app:backgroundTint="@color/purple_700"
             android:textColor="@android:color/white"
             android:layout_marginTop="20dp" />
     </LinearLayout>

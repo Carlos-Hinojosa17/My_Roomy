@@ -49,8 +49,7 @@
                     android:layout_height="40dp"
                     android:layout_gravity="bottom|end"
                     android:layout_margin="6dp"
-                    android:background="@drawable/bg_round_button"
-                    android:backgroundTint="@color/purple_500"
+                    android:background="@drawable/button_gradient"
                     android:contentDescription="Seleccionar imagen de perfil"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_image"
@@ -138,16 +137,16 @@
                 android:inputType="textEmailAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
         <!-- Botón Guardar -->
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGuardarUsuario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_gradient"
             android:text="Guardar usuario"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:icon="@drawable/ic_save"
             app:iconPadding="8dp"
-            app:backgroundTint="@color/purple_700"
             android:textColor="@android:color/white"
             android:layout_marginTop="20dp" />
 

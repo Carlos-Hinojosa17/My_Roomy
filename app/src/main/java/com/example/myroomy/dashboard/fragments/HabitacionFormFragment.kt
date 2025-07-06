@@ -7,12 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.myroomy.dashboard.database.HabitacionDAO
 import com.example.myroomy.dashboard.models.Habitacion
-import com.example.myroomy.dashboard.utils.FragmentHelper
 import com.example.myroomy.databinding.FragmentAdminHabitacionFormBinding
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -67,38 +65,38 @@ class HabitacionFormFragment : Fragment() {
             (binding.spinnerCategoria as? MaterialAutoCompleteTextView)?.setText(h.categoria, false)
             (binding.spinnerEstado as? MaterialAutoCompleteTextView)?.setText(h.estado, false)
             rutaImagenGuardada = h.imagen
+
             if (h.imagen.startsWith("http")) {
-                // Imagen de una URL
                 Glide.with(this)
                     .load(h.imagen)
                     .placeholder(android.R.color.darker_gray)
-                    .error(android.R.color.darker_gray)
                     .into(binding.previewImagen)
             } else {
-                // Imagen local
                 Glide.with(this)
                     .load(File(h.imagen))
                     .placeholder(android.R.color.darker_gray)
-                    .error(android.R.color.darker_gray)
                     .into(binding.previewImagen)
             }
 
             h.servicios.forEach { servicio ->
-                val chip = crearChip(servicio)
-                binding.chipGroupServicios.addView(chip)
+                binding.chipGroupServicios.addView(crearChip(servicio))
             }
         } ?: run {
             binding.txtTituloFormulario.text = "Agregar habitación"
         }
 
         binding.btnAgregarServicio.setOnClickListener {
-            val servicio = binding.inputServicioUnitario.text.toString().trim()
-            if (servicio.isNotEmpty()) {
-                val chip = crearChip(servicio)
-                binding.chipGroupServicios.addView(chip)
-                binding.inputServicioUnitario.setText("")
+            val serviciosActuales = mutableListOf<String>()
+            for (i in 0 until binding.chipGroupServicios.childCount) {
+                val chip = binding.chipGroupServicios.getChildAt(i) as Chip
+                serviciosActuales.add(chip.text.toString())
             }
+
+            ServiciosBottomSheet(serviciosActuales) { servicio ->
+                agregarServicioChip(servicio)
+            }.show(parentFragmentManager, "ServiciosBottomSheet")
         }
+
 
         binding.btnSeleccionarImagen.setOnClickListener {
             seleccionarImagenLauncher.launch("image/*")
@@ -106,6 +104,21 @@ class HabitacionFormFragment : Fragment() {
 
         binding.btnGuardarHabitacion.setOnClickListener {
             guardarHabitacion()
+        }
+    }
+
+
+
+    private fun agregarServicioChip(servicio: String) {
+        val yaExiste = (0 until binding.chipGroupServicios.childCount).any { i ->
+            val chip = binding.chipGroupServicios.getChildAt(i) as Chip
+            chip.text.toString().equals(servicio, ignoreCase = true)
+        }
+
+        if (yaExiste) {
+            Toast.makeText(requireContext(), "Este servicio ya fue agregado", Toast.LENGTH_SHORT).show()
+        } else {
+            binding.chipGroupServicios.addView(crearChip(servicio))
         }
     }
 
@@ -133,35 +146,31 @@ class HabitacionFormFragment : Fragment() {
         }
 
         if (nombre.isBlank() || rutaImagenGuardada.isNullOrBlank()) {
-            Toast.makeText(requireContext(), "Completa nombre e imagen", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Completa el nombre e imagen", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val habitacion = if (habitacionExistente != null) {
-            habitacionExistente!!.copy(
-                nombre = nombre,
-                descripcion = descripcion,
-                categoria = categoria,
-                imagen = rutaImagenGuardada!!,
-                estado = estado,
-                precio = precio,
-                numeroHabitacion = numeroHabitacion,
-                piso = piso,
-                servicios = servicios
-            )
-        } else {
-            Habitacion(
-                nombre = nombre,
-                descripcion = descripcion,
-                categoria = categoria,
-                imagen = rutaImagenGuardada!!,
-                estado = estado,
-                precio = precio,
-                numeroHabitacion = numeroHabitacion,
-                piso = piso,
-                servicios = servicios
-            )
-        }
+        val habitacion = habitacionExistente?.copy(
+            nombre = nombre,
+            descripcion = descripcion,
+            categoria = categoria,
+            imagen = rutaImagenGuardada!!,
+            estado = estado,
+            precio = precio,
+            numeroHabitacion = numeroHabitacion,
+            piso = piso,
+            servicios = servicios
+        ) ?: Habitacion(
+            nombre = nombre,
+            descripcion = descripcion,
+            categoria = categoria,
+            imagen = rutaImagenGuardada!!,
+            estado = estado,
+            precio = precio,
+            numeroHabitacion = numeroHabitacion,
+            piso = piso,
+            servicios = servicios
+        )
 
         if (habitacionExistente != null) {
             habitacionDAO.actualizar(habitacion)
